@@ -35,19 +35,42 @@ vector<int> findRoute(vector<int>& route, vector<int>& pen, int beg, int end){
     }
 }
 
+//tentar implementar o vetor de visitado com lista em vez de vector
 void dijkstra(int beg, const vector<vector<double>>&matrix, vector<double>& distance, vector<bool>& visited, vector<int>& pen){
-    int min = INFINITY;
+    for(int i = 0; i < matrix.size(); i++){
+        int indexAux = -1;
 
-    //for(int i = 1; i )
+        for(int j = 0; j < matrix.size(); j++){
+            if(!visited[j] && (v == -1 || distance[j] < distance[indexAux])){
+                indexAux = j;
+            }
+        }
+
+        if(d[v] == INFINITY){
+            break;
+        }
+
+        visited[indexAux] = true;
+
+        //pode mudar isso para caso o grafo nao seja completo
+        for(int j = 0; j < matrix.size(); j++){
+            if(matrix[indexAux][j]){//desse jeito ou ao contrario
+                double soma = distance[indexAux] + matrix[indexAux][j];
+                if(distance[j] > soma){   
+                    distance[j] = soma;
+                }
+            }
+        }
+    }
 }
 
 Route shortestPath(int beg, int end, const vector<vector<double>>& matrix){
     Route R;
 
-    vector<bool> visited(matrix.size(), 0);
-    vector<double> distance(matrix.size(), INFINITY);
-    distance[beg] = 0;
-    vector<int> pen(matrix.size(), -1);
+    vector<bool> visited(matrix.size(), 0); //inicializa todos como falso
+    vector<double> distance(matrix.size(), INFINITY);//inicializa todos como infinito
+    distance[beg] = 0;//altera apenas o vertice de partida para 0
+    vector<int> pen(matrix.size(), -1);//vetor de penultimo vertice visitado antes de chegar nele
 
     dijkstra(beg, matrix, distance, visited, pen);
 
