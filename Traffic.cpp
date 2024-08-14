@@ -7,16 +7,16 @@ using namespace std;
 
 //olhar priority Queue para ver se nao fica melhor
 //funcao que inicializa e preenche a matriz de adjacencia
-void preencheAdj(const vector<vector<double>>& matrix, vector<vector<int>>& adj){
+void preencheAdj(const vector<vector<double>>& matrix, vector<vector<pair<int, double>>>& adj){
     int n = matrix.size();
 
     for(int i = 0; i < n; i++){
-        vector<int> aux;
+        vector<pair<int, double>> aux;
         //cout << "Criando a adjacencia do vertice " << i << ":" << endl;
         for(int j = 0; j < n; j++){
             if(matrix[i][j]){
                 //cout << "Adicionei o vertice " << j << endl;
-                aux.push_back(j);
+                aux.push_back(make_pair(j, matrix[i][j]));
             }
         }
         adj.push_back(aux);
@@ -55,44 +55,45 @@ void findRoute(vector<int>& route, vector<int>& pen, int beg, int end){
 }
 
 //tentar implementar o vetor de visitado com lista em vez de vector
-void dijkstra(int beg, const vector<vector<double>>&matrix, vector<double>& distance, vector<bool>& visited, vector<int>& pen){
-    for(int i = 0; i < matrix.size(); i++){
+void dijkstra(int beg, const vector<vector<pair<int, double>>>&adj, vector<double>& distance, vector<bool>& visited, vector<int>& pen){
+    int n = adj.size();
+    for(int i = 0; i < n; i++){
         int indexAux = -1;
 
-        for(int j = 0; j < matrix.size(); j++){//pode mudar isso para uma lista de visitados para fazer menos iteracoes
+        for(int j = 0; j < n; j++){//pode mudar isso para uma lista de visitados para fazer menos iteracoes
             if(!visited[j] && (indexAux == -1 || distance[j] < distance[indexAux])){
                 indexAux = j;
             }
         }
 
-        if(distance[indexAux] == INFINITY){
+        if(distance[indexAux] == INFINITY){//criterio de parada caso tenha um vertice isolado
             break;
         }
 
         visited[indexAux] = true;
 
-        //pode mudar isso para caso o grafo nao seja completo
-        for(int j = 0; j < matrix.size(); j++){
-            if(matrix[indexAux][j]){
-                double soma = distance[indexAux] + matrix[indexAux][j];
-                if(distance[j] > soma){   
-                    distance[j] = soma;
-                    pen[j] = indexAux;
-                }
+        for(auto edge : adj[indexAux]){//visita todas os vertices ligados a indexAux
+            double soma = distance[indexAux] + edge.second; //faz a soma da atual menor distancia do inicio para o
+                                                            //indexAux com a distancia dele para o vertice em iteracao
+
+            if(distance[edge.first] > soma){//verifica se essa soma é menor do que a atual menor distancia para esse vertice iterado
+                distance[edge.first] = soma;//caso positivo atualiza essa menor distancia
+                pen[edge.first] = indexAux; //salva o novo penultimo vertice
             }
         }
     }
 }
 
-Route shortestPath(int beg, int end, const vector<vector<double>>& matrix){
+Route shortestPath(int beg, int end, const vector<vector<pair<int, double>>>& adj){
     Route R;
+    int n = adj.size();
 
-    vector<bool> visited(matrix.size(), 0); //inicializa todos como falso
-    vector<double> distance(matrix.size(), INFINITY);//inicializa todos como infinito
+    vector<bool> visited(n, 0); //inicializa todos como falso
+    vector<double> distance(n, INFINITY);//inicializa todos como infinito
     distance[beg] = 0;//altera apenas o vertice de partida para 0
-    vector<int> pen(matrix.size(), -1);//vetor de penultimo vertice visitado antes de chegar nele
+    vector<int> pen(n, -1);//vetor de penultimo vertice visitado antes de chegar nele
 
-    dijkstra(beg, matrix, distance, visited, pen);
+    dijkstra(beg, adj, distance, visited, pen);
 
     R.obj = distance[end];
     findRoute(R.route, pen, beg, end);
@@ -132,7 +133,7 @@ int main(){
                                                     {3, 4, 8, 0, 1},
                                                     {12, 5, 4, 1, 0}};
 
-    vector<vector<int>> adj_matrix;
+    vector<vector<pair<int, double>>> adj_matrix;
     
     preencheAdj(base_distance_matrix, adj_matrix);
 
@@ -157,16 +158,19 @@ int main(){
     for(int i = 0; i < adj_matrix.size(); i++){
         cout << "|";
         for(int j = 0; j < adj_matrix[i].size(); j++){
-            cout << adj_matrix[i][j] << ((j == (adj_matrix[i].size() - 1)) ? "|\n" : ", ");
+            cout << adj_matrix[i][j].first << ((j == (adj_matrix[i].size() - 1)) ? "|\n" : ", ");
         }
     }
 
     Route r;
     int beg = 2;
     int end = 3;
-    r = shortestPath(beg, end, base_distance_matrix);
+    r = shortestPath(beg, end, adj_matrix);
     cout << "Valor obj: " << r.obj << endl;
     exibeRota(r);
+
+    //antes tava dando 2 -> 4 -> 3
+    //valor 5
 
     return 0;
 }
