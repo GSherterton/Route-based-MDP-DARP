@@ -127,22 +127,22 @@ void exibeRota(Route r){
 //trabalhando com o grafo nesse sentido nao faria sentido o grafo ser completo e nesse sentido faria sentido usar uma matriz de adjacencia
 int main(){
     //uma matriz base que sera usada como os menores tempos de viagem de um ponto ao outro
-    vector<vector<double>> base_distance_matrix =   {{0, 7, 10, 3, 12},
-                                                    {7, 0, 3, 4, 5},
-                                                    {10, 3, 0, 8, 4},
-                                                    {3, 4, 8, 0, 1},
-                                                    {12, 5, 4, 1, 0}};
+    vector<vector<double>> base_distance_matrix =   {{ 0,  7, 10,  3, 12},
+                                                     { 7,  0,  3,  4,  5},
+                                                     {10,  3,  0,  8,  4},
+                                                     { 3,  4,  8,  0,  1},
+                                                     {12,  5,  4,  1,  0}};
 
     vector<vector<pair<int, double>>> adj_matrix;
     
     preencheAdj(base_distance_matrix, adj_matrix);
 
     //uma matriz de trafego que sera usada para armazenar o valor do trafego, minimo valor é 1
-    vector<vector<double>> traffic_matrix =     {{0, 1, 1.3, 1.1, 1.2},
-                                                {1, 0, 1.8, 1.3, 1},
-                                                {1.3, 1.8, 0, 1, 1.2},
-                                                {1.1, 1.3, 1, 0, 1},
-                                                {1.2, 1, 1.2, 1, 0}};
+    vector<vector<double>> traffic_matrix =     {{0.0, 1.0, 1.3, 1.1, 1.2},
+                                                 {1.0, 0.0, 1.8, 1.3, 1.0},
+                                                 {1.3, 1.8, 0.0, 1.0, 1.2},
+                                                 {1.1, 1.3, 1.0, 0.0, 1.0},
+                                                 {1.2, 1.0, 1.2, 1.0, 0.0}};
 
     vector<vector<double>> current_distance_matrix = base_distance_matrix;
 
